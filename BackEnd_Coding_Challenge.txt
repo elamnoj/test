@@ -1,0 +1,167 @@
+#!/usr/bin/env python
+# coding: utf-8
+
+# # Problem 1
+# 
+# Please write a function to deduplicate an iterable while preserving order (order is based on the first occurrence of each unique item in the iterable).
+# 
+# Arguments:
+# • Iterable
+# • (Optional) Function argument that can be applied to each element and used to deduplicate, instead of the element itself.
+# Returns:
+# • Deduplicated iterable
+# 
+# Example usage follows.
+# 
+# deduplicate([1, 3, 2, 3])
+# 
+# [1, 3, 2]
+# 
+# deduplicate([5, 8, 9, 6, 10], lambda x: x % 3)
+# 
+# [5, 9, 10]
+# 
+# deduplicate([1, -1, -2, 2, 3], abs)
+# 
+# [1, -2, 3]
+
+# Notes: The first premise is simple enough. My inclination on reading this for the first time is to use a simple membership test. 
+
+# In[1]:
+
+
+def deduplicate(_list):
+    new=[]
+    for i in _list:
+        if i not in new:
+            new.append(i)
+    return new
+
+
+# In[2]:
+
+
+deduplicate([1, 3, 2, 3])
+
+
+# Notes: The above function works fine for a simple membership test. But becomes slightly more complicated for added function arguments I like making use of dictionaries and the OrderedDict from the collections library built into Python, mostly because it allows be to keep track of inputs/outputs.
+
+# In[3]:
+
+
+from collections import OrderedDict
+
+def deduplicate2(_list,arg):
+    new= {}
+    result = {}
+    for i in _list:
+        new[i] = arg(i)
+    for key,value in new.items():
+        if value not in result.values():
+            result[key] = value
+    return result.keys()
+
+
+# In[4]:
+
+
+deduplicate2([5, 8, 9, 6, 10], lambda x: x % 3)
+
+
+# Problem 2
+# Please write a function to truncate a string to n characters by replacing the middle characters with an ellipsis ..., unless the ellipsis would replace fewer than 5 characters, in which case do not truncate the string.
+# Arguments:
+# • String - A string of any length
+# • (Optional, default 40) Integer – Maximum length of the string, including the ellipsis (unless the ellipsis would replace <5 characters) 
+# Returns:
+# • A string of maximum 41 characters (40 plus an ellipsis) Example usage follows:
+
+# truncate_middle("I wandered lonely as a cloud / That floats on high o'er vales and hills")
+# I wandered lonely as...'er vales and hills'
+
+# truncate_middle("I saw his round mouth's crimson deepen as it fell", 25) 
+'I saw his ro...n as it fell'
+
+# truncate_middle("Much have I travell'd in the realms of gold") 
+"Much have I travell'd in the realms of gold"
+
+# In[ ]:
+
+
+
+
+
+# In[5]:
+
+
+string="I wandered lonely as a cloud / That floats on high o'er vales and hills"
+
+def truncate_middle(string,n):
+    if len(string) - n < 5:
+        return string
+    else:
+        return f'{string[:(n//2)]}...{string[-(n//2):]}'
+        
+
+
+# In[6]:
+
+
+truncate_middle("I saw his round mouth's crimson deepen as it fell", 25)
+
+
+# ### Please write a function with the following docstring:
+# 
+# ### Turn an array of strings into URL-safe slugs by:
+# #### 1) trimming them
+# #### 2) converting them to lowercase
+# #### 3) replacing non-alphanumeric or non-ASCII characters with hyphens
+# #### 4) reducing adjacent hyphens to single hyphens
+# #### 5) appending numbers to duplicate slugs, to make them unique within the array (after applying steps 1-4)
+# 
+# #### Arguments:
+# inputs {[String]} -- A list of strings
+# 
+# #### Returns:
+# An array of URL-safe slugs
+# 
+# #### Examples:
+# slugify(['Alex', 'Alex Alexander', 'alex@metop.io', 'ALEX']) 
+# ['alex', 'alex-alexander', 'alex-metop-io', 'alex-1']
+# 
+# slugify(['Alex', 'alex ', ' Another Alex', 'ALEX', 'another.?.alex'])
+# ['alex', 'alex-1', 'another-alex', 'alex-2', 'another-alex-1']
+# 
+# slugify(['Alex 1', 'Alex 3', 'Alex', 'Alex']) 
+# ['alex-1', 'alex-3', 'alex', 'alex-2']
+# 
+# (URL-safe letters, in this case, are ASCII characters matching the regex [A-Za-z0-9-]. Alphanumeric characters match [A-Za-z0-9].)
+
+# In[7]:
+
+
+import re
+
+def slugify(array):
+    _list = []
+    final = {}
+#   Formatting string for lower case, whitespace, and non-alphanumerics
+    for i in array:
+        new=re.sub('\W+', '-', i.strip().lower())
+        _list.append(new)
+#   Appending slugs to duplicate slugs
+    for x in _list:
+        if x in final:
+            final[x] += 1
+            yield "%s-%d" % (x, final[x])
+        else:
+            final[x] = 0
+            yield x
+    return final
+
+
+# In[8]:
+
+
+print(list(slugify(['Alex', 'Alex Alexander', 'alex@metop.io', 'ALEX'])))
+
